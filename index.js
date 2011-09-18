@@ -9,34 +9,39 @@ var argv = require('optimist')
 	.alias('d', 'destination')
 	.describe('d', 'Destination directory')
 	.argv;
+	
 var gm = require('gm');
+var path = require('path');
 
 var source = argv.s || '.';
-var dest = '/Users/clinseman/Public/resized/';
+var dest = argv.d || '.';
 
-var dir2x = '2x/';
-var dir1x = '1x/';
+var dir2x = path.join(dest, '2x') + '/';
+var dir1x = path.join(dest, '1x') + '/';
 
 console.log('starting on directory: ' + source);
 
-utils.createDirSync(dest + dir2x);
-utils.createDirSync(dest + dir1x);
+// create the destination directories (got to be a better way to do this)
+utils.createDirSync(dest);
+utils.createDirSync(dir2x);
+utils.createDirSync(dir1x);
 
-
+// for each image 
 utils.findImageFiles(source, function(err, file){
 	if(err) throw err;
 	
-	utils.copyFile(source + file, dest + dir2x + utils.create2xName(file), function(err, file){
+	// copy it as is to the 2x directory and rename it
+	utils.copyFile(source + file, dir2x + utils.create2xName(file), function(err, file){
 		if(err) throw err;
 		console.log('copied file: ' + file);
 	});
 	
+	// and resize it by 50% and copy it to the 1x directory
 	gm(source + file)
 		.resize(50, 50, '%')
-		.write(dest + dir1x + file, function(err){
+		.write(dir1x + file, function(err){
 			if(err) throw err;
-			console.log('resized file: ' + dest + dir1x + file);
-			//console.log(this.outname);	
+			console.log('resized file: ' + dir1x + file);
 		});
 })
 
