@@ -1,11 +1,11 @@
 {
   "author": "Chris Linseman <clinseman@gmail.com>",
-  "name": "ios_image_resizer",
+  "name": "node_ios_image_resizer",
   "description": "simple script to rename and resize images when working with the retina screen",
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git@codespaces.com:lostzen/ios_image_resizer"
+    "url": "git@github.com:clinseman/node_ios_image_resizer.git"
   },
   "main": "./index.js",
   "engines": {
