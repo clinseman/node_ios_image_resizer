@@ -1,5 +1,7 @@
-var findit = require('findit')
-	 _ = require('underscore'),
+var findit = require('findit'),
+	utils = require('./lib/utils'),
+	fs = require('fs'),
+	 _ = require('underscore')._,
 	path = require('path'),
 	argv = require('optimist').argv;
 
@@ -12,19 +14,29 @@ if(argv.s === undefined){
 var source = argv.s;
 
 console.log('attempting to read dir: ' + source);
-/*
-fs.readdir(source, function(err, files){
-	if(err) throw err;
-	_.each(files, function(file){
-		console.log('file: ' + file);
-		
-	})
-});
-*/
 
+utils.findImageFiles(source, function(err, file){
+	if(err) throw err;
+	console.log(file);
+})
+
+/*
 findit.find(source, function(file, stat){
 	//console.log(file);
 	if(path.extname(file).match(/\.png$/)){
 		console.log(file);
 	}
 })
+*/
+
+/*
+fs.readdir(source, function(err, files){
+	if(err) throw err;
+	_.each(files, function(file){
+		if(path.extname(file).match(/\.png$/)){
+			console.log("file: " + file);		
+		}
+	})
+});
+*/
+
