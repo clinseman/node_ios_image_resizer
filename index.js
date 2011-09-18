@@ -14,33 +14,29 @@ var gm = require('gm');
 var source = argv.s || '.';
 var dest = '/Users/clinseman/Public/resized/';
 
-console.log('attempting to read dir: ' + source);
+var dir2x = '2x/';
+var dir1x = '1x/';
+
+console.log('starting on directory: ' + source);
+
+utils.createDirSync(dest + dir2x);
+utils.createDirSync(dest + dir1x);
+
 
 utils.findImageFiles(source, function(err, file){
 	if(err) throw err;
 	
-	//console.log(source + file);
-	/*
-	gm(source + file).size(function(err, size){
+	utils.copyFile(source + file, dest + dir2x + utils.create2xName(file), function(err, file){
 		if(err) throw err;
-		console.log(size);
-	})
-	*/
-	
-	fs.readFile(source + file, function(err, data){
-		if(err) throw err;
-		fs.writeFile(dest + '_' + file, data, function(err){
-			if(err) throw err;
-			console.log('It\'s saved!');
-		})
+		console.log('copied file: ' + file);
 	});
 	
 	gm(source + file)
 		.resize(50, 50, '%')
-		.write(dest + file, function(err){
+		.write(dest + dir1x + file, function(err){
 			if(err) throw err;
-			console.log(this.outname);	
+			console.log('resized file: ' + dest + dir1x + file);
+			//console.log(this.outname);	
 		});
-	
 })
 
