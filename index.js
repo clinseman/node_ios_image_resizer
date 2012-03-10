@@ -1,6 +1,4 @@
-var fs = require('fs');
 var utils = require('./lib/utils');
-var _ = require('underscore')._;
 var argv = require('optimist')
 	.usage('Resize and copy images.\nUsage: $0 -s [source] -d [destination]')
 	.demand(['s', 'd'])
@@ -10,7 +8,7 @@ var argv = require('optimist')
 	.describe('d', 'Destination directory')
 	.argv;
 	
-var gm = require('gm');
+var easyimg = require('easyimage');
 var path = require('path');
 
 var source = argv.s || '.';
@@ -29,7 +27,7 @@ utils.createDirSync(dir1x);
 // for each image 
 utils.findImageFiles(source, function(err, file){
 	if(err) throw err;
-	
+		
 	// copy it as is to the 2x directory and rename it
 	utils.copyFile(source + file, dir2x + utils.create2xName(file), function(err, file){
 		if(err) throw err;
@@ -37,11 +35,15 @@ utils.findImageFiles(source, function(err, file){
 	});
 	
 	// and resize it by 50% and copy it to the 1x directory
-	gm(source + file)
-		.resize(50, 50, '%')
-		.write(dir1x + file, function(err){
-			if(err) throw err;
-			console.log('resized file: ' + dir1x + file);
-		});
+			
+	easyimg.resize({
+	  src: source + file,
+	  dst: dir1x + file,
+	  width:   '50%',
+	  height:   '50%'
+	}, function(err, stdout, stderr){
+	  if (err) throw err
+	  console.log('resized 50%')
+	});
 })
 
