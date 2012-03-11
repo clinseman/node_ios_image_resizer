@@ -14,6 +14,7 @@
   "dependencies": {
     "easyimage": "0.0.4",
     "optimist": "0.2.6",
+    "file": "0.2.0",
     "underscore": "1.1.7"
   },
   "devDependencies": {}
