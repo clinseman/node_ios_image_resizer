@@ -1,47 +1,61 @@
-var fs = require('fs');
 var utils = require('./lib/utils');
-var _ = require('underscore')._;
+var easyimg = require('easyimage');
+var path = require('path');
+var file = require('file');
 var argv = require('optimist')
-	.usage('Resize and copy images.\nUsage: $0 -s [source] -d [destination]')
-	.demand(['s', 'd'])
+	.usage('Resize and copy images.\nUsage: $0 -s [source]')
+	.demand(['s'])
 	.alias('s', 'source')
 	.describe('s', 'Source directory')
-	.alias('d', 'destination')
-	.describe('d', 'Destination directory')
 	.argv;
 	
-var gm = require('gm');
-var path = require('path');
+var filesToIgnore = ['.DS_Store'];
+var extensionsValid = ['.png', '.jpg'];
 
 var source = argv.s || '.';
-var dest = argv.d || '.';
-
-var dir2x = path.join(dest, '2x') + '/';
-var dir1x = path.join(dest, '1x') + '/';
 
 console.log('starting on directory: ' + source);
 
-// create the destination directories (got to be a better way to do this)
-utils.createDirSync(dest);
-utils.createDirSync(dir2x);
-utils.createDirSync(dir1x);
-
-// for each image 
-utils.findImageFiles(source, function(err, file){
+file.walk(source, function (err, dirPath, dirs, files) {
 	if(err) throw err;
 	
-	// copy it as is to the 2x directory and rename it
-	utils.copyFile(source + file, dir2x + utils.create2xName(file), function(err, file){
-		if(err) throw err;
-		console.log('copied file: ' + file);
-	});
+	var dirname = path.basename(dirPath);
 	
-	// and resize it by 50% and copy it to the 1x directory
-	gm(source + file)
-		.resize(50, 50, '%')
-		.write(dir1x + file, function(err){
-			if(err) throw err;
-			console.log('resized file: ' + dir1x + file);
-		});
-})
+	if (dirname == 'iOS') {
+		return;
+	}
+	
+	for (var i=0; i<files.length; i++) {
+	
+		var file = files[i];
 
+		var filename = path.basename(file);	
+		var extname = path.extname(file);	
+		var basename = path.basename(file, extname);	
+		var dirname = path.dirname(file);	
+
+		if (!filesToIgnore.contains(basename) && extensionsValid.contains(extname)) {
+			
+			console.log('found file: ' + basename);
+		
+			utils.createDirSync(dirname + '/iOS');
+			
+			utils.copyFile(file, dirname + '/iOS/' + basename + '@2x.png', function(err, file){
+				if(err) throw err;
+				console.log('copied file: ' + file);
+			});
+			
+	
+			easyimg.resize({
+			  src: file,
+			  dst: dirname + '/iOS/' + filename,
+			  width:   '50%',
+			  height:   '50%'
+			}, function(err, stdout, stderr){
+			  if (err) throw err
+				console.log('resized file: ' + file + ' to 50%');
+			});
+		}
+	}
+	
+});
